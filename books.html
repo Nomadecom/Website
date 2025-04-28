@@ -1,0 +1,235 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nomad Economy - Recommended Books</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    header { background-color: #e1e1e1; }
+    .book-card { background-color: #e1e1e1; }
+    .custom-button { background-color: #888680; }
+    footer { background-color: #888680; }
+    body {
+      background-image: url('/Website/background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      position: relative;
+      display: flex !important;
+      flex-direction: column !important;
+      min-height: 100vh !important;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.7);
+      z-index: 1;
+    }
+    body > * {
+      position: relative;
+      z-index: 2;
+    }
+    main {
+      flex: 1 !important;
+    }
+    .dropdown-menu {
+      display: none;
+    }
+    .dropdown-menu.active {
+      display: block;
+    }
+  </style>
+</head>
+<body class="font-sans">
+  <!-- Header -->
+  <header class="py-6 px-4 text-center">
+    <div class="flex justify-center items-center max-w-4xl mx-auto">
+      <img src="/Website/logo.jpg" alt="Nomad Economy Logo" class="h-30 md:h-20 max-w-md">
+    </div>
+  </header>
+
+  <!-- Menu Button -->
+  <div class="px-1 py-1">
+    <div class="relative dropdown">
+      <button id="menuButton" class="custom-button text-white px-4 py-2 rounded hover:bg-gray-700">Menu</button>
+      <div id="dropdownMenu" class="dropdown-menu absolute bg-white shadow-lg rounded mt-2 z-10">
+        <a href="index.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 menu-item">Home</a>
+        <a href="about.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 menu-item">About</a>
+        <a href="articles.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 menu-item">Articles</a>
+        <a href="books.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 menu-item">Book Recommendations</a>
+        <a href="contact.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 menu-item">Contact</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto py-8 px-4">
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Why These Books?</h2>
+      <p class="text-gray-600">
+        Welcome to my book list on understanding economics with a bit of history! These are the books I recommend to help you grasp how an economy works, exploring economic theories and practices that, based on historic events, have shown great success. These reads will help you see economics in a different light, offering fresh perspectives on wealth, markets, and more. I share new recommendations on <a href="https://x.com/nomadholdings" class="text-blue-600 hover:underline">X</a>, so follow me for updates!
+      </p>
+    </section>
+
+    <section class="py-8 px-4 rounded-lg">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6">Recommended Books</h2>
+      <div class="space-y-6">
+        <!-- Book 1 -->
+        <div class="book-card p-6 rounded-lg shadow-md flex items-start space-x-4">
+          <img src="/book-recommendations/Peter Schiff.jpg" alt="How an Economy Grows and Why It Crashes Cover" class="w-24 h-32 object-cover">
+          <div>
+            <h3 class="text-xl font-bold text-gray-800">How an Economy Grows and Why It Crashes</h3>
+            <p class="text-gray-600 mt-1">By Peter D. Schiff</p>
+            <p class="text-gray-600 mt-2">
+              An engaging allegory that simplifies economic concepts, explaining growth, inflation, and crashes through a story of an island economy.
+            </p>
+            <a href="https://amzn.to/447qBD6" target="_blank" class="inline-block mt-4 custom-button text-white px-4 py-2 rounded hover:bg-gray-700">
+              Buy Now
+            </a>
+          </div>
+        </div>
+
+        <!-- Book 2 -->
+        <div class="book-card p-6 rounded-lg shadow-md flex items-start space-x-4">
+          <img src="/book-recommendations/David Moss.jpg" alt="A Concise Guide to Macroeconomics Cover" class="w-24 h-32 object-cover">
+          <div>
+            <h3 class="text-xl font-bold text-gray-800">A Concise Guide to Macroeconomics</h3>
+            <p class="text-gray-600 mt-1">By David A. Moss</p>
+            <p class="text-gray-600 mt-2">
+              A clear and concise primer on macroeconomic principles, covering output, money, and international trade with practical examples.
+            </p>
+            <a href="https://amzn.to/42vv55f" target="_blank" class="inline-block mt-4 custom-button text-white px-4 py-2 rounded hover:bg-gray-700">
+              Buy Now
+            </a>
+          </div>
+        </div>
+
+        <!-- Book 3 -->
+        <div class="book-card p-6 rounded-lg shadow-md flex items-start space-x-4">
+          <img src="/book-recommendations/Ray Dalio.jpg" alt="Principles for Dealing with the Changing World Order Cover" class="w-24 h-32 object-cover">
+          <div>
+            <h3 class="text-xl font-bold text-gray-800">Principles for Dealing with the Changing World Order: Why Nations Succeed and Fail</h3>
+            <p class="text-gray-600 mt-1">By Ray Dalio</p>
+            <p class="text-gray-600 mt-2">
+              An in-depth analysis of economic cycles, exploring why nations rise and fall, with insights for navigating global economic shifts.
+            </p>
+            <a href="https://amzn.to/3ELNa5O" target="_blank" class="inline-block mt-4 custom-button text-white px-4 py-2 rounded hover:bg-gray-700">
+              Buy Now
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-white py-1 text-center">
+    <p>Follow us on <a href="https://x.com/nomadholdings" class="text-blue-400 hover:underline">X</a> for more recommendations!</p>
+    <p class="mt-2 text-sm">© 2025 Nomad Economy. All rights reserved.</p>
+  </footer>
+
+  <!-- XLSX Script -->
+  <script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+      return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+      if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+          var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+          var firstSheetName = workbook.SheetNames[0];
+          var worksheet = workbook.Sheets[firstSheetName];
+          var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+          var filteredData = jsonData.filter(row => row.some(filledCell));
+          var headerRowIndex = filteredData.findIndex((row, index) =>
+            row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+          );
+          if (headerRowIndex === -1 || headerRowIndex > 25) {
+            headerRowIndex = 0;
+          }
+          var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+          csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+          return csv;
+        } catch (e) {
+          console.error(e);
+          return "";
+        }
+      }
+      return gk_fileData[filename] || "";
+    }
+  </script>
+
+  <!-- Menu Toggle Script -->
+  <script>
+    const menuButton = document.getElementById('menuButton');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    menuButton.addEventListener('click', function(event) {
+      event.stopPropagation();
+      dropdownMenu.classList.toggle('active');
+    });
+
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+      item.addEventListener('click', function() {
+        dropdownMenu.classList.remove('active');
+      });
+    });
+
+    document.addEventListener('click', function(event) {
+      if (!dropdownMenu.contains(event.target) && !menuButton.contains(event.target)) {
+        dropdownMenu.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
